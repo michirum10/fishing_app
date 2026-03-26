@@ -1,0 +1,50 @@
+[
+  {
+    "id": "kushimoto",
+    "name": "串本・大島",
+    "area": "和歌山南部",
+    "lat": 33.477,
+    "lon": 135.856,
+    "jmaCode": "300000",
+    "jmaArea": "南部",
+    "tidePort": "kushimoto",
+    "types": ["渡船", "磯"],
+    "ryosen": []
+  },
+  {
+    "id": "kada",
+    "name": "加太",
+    "area": "和歌山北部",
+    "lat": 34.150,
+    "lon": 135.204,
+    "jmaCode": "300000",
+    "jmaArea": "北部",
+    "tidePort": "kada",
+    "types": ["渡船", "堤防"],
+    "ryosen": []
+  },
+  {
+    "id": "yura",
+    "name": "由良",
+    "area": "和歌山中部",
+    "lat": 33.960,
+    "lon": 135.100,
+    "jmaCode": "300000",
+    "jmaArea": "南部",
+    "tidePort": "yura",
+    "types": ["渡船", "磯"],
+    "ryosen": []
+  },
+  {
+    "id": "izumisano",
+    "name": "泉佐野",
+    "area": "大阪南部",
+    "lat": 34.400,
+    "lon": 135.430,
+    "jmaCode": "270000",
+    "jmaArea": "南部",
+    "tidePort": "izumisano",
+    "types": ["堤防", "沖堤"],
+    "ryosen": []
+  }
+]
