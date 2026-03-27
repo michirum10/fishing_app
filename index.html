@@ -3,65 +3,770 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>釣り天気 動作確認</title>
+  <meta name="theme-color" content="#0b1120">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="釣り天気">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="manifest" href="/manifest.json">
+  <title>釣り天気</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
   <style>
-    body { font-family: monospace; background: #0b1120; color: #e2e8f0; padding: 20px; }
-    h2 { color: #38bdf8; }
-    .ok  { color: #22c55e; }
-    .err { color: #ef4444; }
-    pre  { background: #1a2540; padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
-    .section { margin-bottom: 24px; }
+    :root {
+      --bg: #0b1120;
+      --surface: #131f35;
+      --surface2: #1a2a45;
+      --border: #1e3a5f;
+      --text: #e2e8f0;
+      --muted: #7898b8;
+      --cyan: #38bdf8;
+      --cyan-dark: #0ea5e9;
+      --green: #22c55e;
+      --yellow: #facc15;
+      --red: #ef4444;
+      --orange: #f97316;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, 'Hiragino Sans', sans-serif; }
+
+    /* ── Header ── */
+    #header {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: env(safe-area-inset-top, 0) 0 0;
+    }
+    #header-inner {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px 8px;
+    }
+    #header h1 { font-size: 18px; font-weight: 700; color: var(--cyan); flex-shrink: 0; }
+
+    /* ── Spot Search ── */
+    #spot-search-row {
+      display: flex; gap: 6px; padding: 0 12px 8px; flex-wrap: wrap;
+    }
+    #pref-select, #spot-input {
+      flex: 1; min-width: 100px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); border-radius: 8px; padding: 7px 10px;
+      font-size: 14px; appearance: none;
+    }
+    #pref-select { max-width: 130px; }
+    #search-btn {
+      background: var(--cyan-dark); color: #fff; border: none;
+      border-radius: 8px; padding: 7px 14px; font-size: 14px; cursor: pointer;
+    }
+
+    /* ── Spot List Dropdown ── */
+    #spot-list {
+      display: none; position: absolute; z-index: 200;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; max-height: 240px; overflow-y: auto;
+      left: 12px; right: 12px; top: auto;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    #spot-list.open { display: block; }
+    .spot-item {
+      padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .spot-item:hover { background: var(--surface); }
+    .spot-item .spot-name { font-weight: 600; }
+    .spot-item .spot-area { font-size: 12px; color: var(--muted); }
+
+    /* ── Current Spot Badge ── */
+    #current-spot {
+      padding: 4px 12px 6px;
+      font-size: 13px; color: var(--muted);
+    }
+    #current-spot span { color: var(--cyan); font-weight: 600; }
+
+    /* ── Tabs ── */
+    #tabs {
+      display: flex; border-bottom: 1px solid var(--border);
+      overflow-x: auto; scrollbar-width: none;
+      background: var(--bg);
+    }
+    #tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex: 1; min-width: 70px; padding: 10px 4px;
+      background: none; border: none; color: var(--muted);
+      font-size: 13px; cursor: pointer; white-space: nowrap;
+      border-bottom: 2px solid transparent;
+    }
+    .tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+
+    /* ── Tab Content ── */
+    .tab-pane { display: none; padding: 12px; }
+    .tab-pane.active { display: block; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; margin-bottom: 12px;
+    }
+    .card-title { font-size: 12px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* ── Weather Tab ── */
+    #api-status {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--muted);
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;
+    }
+    #api-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex-shrink: 0; }
+    #api-dot.ok { background: var(--green); }
+    #api-dot.err { background: var(--red); }
+
+    .mazume-row {
+      display: flex; gap: 8px;
+    }
+    .mazume-card {
+      flex: 1; background: var(--surface2); border-radius: 8px; padding: 10px;
+      text-align: center;
+    }
+    .mazume-card .label { font-size: 11px; color: var(--muted); }
+    .mazume-card .time { font-size: 16px; font-weight: 700; color: var(--orange); }
+    .mazume-card .range { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .forecast-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    }
+    .forecast-day {
+      background: var(--surface2); border-radius: 10px; padding: 10px;
+      text-align: center;
+    }
+    .forecast-day .fday { font-size: 12px; color: var(--muted); }
+    .forecast-day .ficon { font-size: 28px; margin: 4px 0; }
+    .forecast-day .ftemp { font-size: 13px; font-weight: 600; }
+    .forecast-day .fwind { font-size: 11px; color: var(--cyan); margin-top: 4px; }
+    .forecast-day .frain { font-size: 11px; color: #60a5fa; }
+
+    /* ── Tide Tab ── */
+    #tide-chart-wrap {
+      position: relative; height: 220px; margin-bottom: 4px;
+    }
+    .tide-meta {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;
+    }
+    .tide-meta-item {
+      background: var(--surface2); border-radius: 8px; padding: 8px 10px;
+      text-align: center;
+    }
+    .tide-meta-item .label { font-size: 11px; color: var(--muted); }
+    .tide-meta-item .val { font-size: 15px; font-weight: 700; color: var(--cyan); }
+    .tide-badge {
+      display: inline-block; border-radius: 6px; padding: 4px 12px;
+      font-size: 13px; font-weight: 700; margin-bottom: 8px;
+    }
+    .tide-badge.大潮 { background: #dc2626; color: #fff; }
+    .tide-badge.中潮 { background: #d97706; color: #fff; }
+    .tide-badge.小潮 { background: #16a34a; color: #fff; }
+    .tide-badge.長潮 { background: #6b7280; color: #fff; }
+    .tide-badge.若潮 { background: #2563eb; color: #fff; }
+
+    /* ── Wind Map Tab ── */
+    #windy-wrap {
+      border-radius: 12px; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    #windy-frame {
+      width: 100%; height: 440px; border: none; display: block;
+    }
+    #windy-loading {
+      display: flex; align-items: center; justify-content: center;
+      height: 440px; color: var(--muted); font-size: 14px;
+    }
+
+    /* ── Calendar Tab ── */
+    #cal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    #cal-title { font-size: 16px; font-weight: 700; }
+    .cal-nav {
+      background: var(--surface2); border: none; color: var(--text);
+      border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: 16px;
+    }
+    #cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px;
+    }
+    .cal-dow {
+      text-align: center; font-size: 11px; color: var(--muted);
+      padding: 4px 0;
+    }
+    .cal-day {
+      background: var(--surface2); border-radius: 6px;
+      padding: 4px 2px; text-align: center; min-height: 52px;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .cal-day:hover { background: var(--border); }
+    .cal-day.today { border: 1px solid var(--cyan); }
+    .cal-day.empty { background: transparent; cursor: default; }
+    .cal-day .cday { font-size: 13px; font-weight: 600; }
+    .cal-day .ctide { font-size: 9px; margin-top: 2px; }
+    .cal-day .ctide-dot { font-size: 14px; line-height: 1; }
+    .cal-legend {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+    }
+    .cal-legend-item { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+
+    /* ── Loading / Error ── */
+    .loading { color: var(--muted); font-size: 14px; padding: 20px; text-align: center; }
+    .error-msg { color: var(--red); font-size: 13px; padding: 10px 0; }
+
+    /* ── Responsive ── */
+    @media (max-width: 360px) {
+      .forecast-grid { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body>
-  <h1>🎣 API 動作確認</h1>
 
-  <div class="section">
-    <h2>① 気象庁API（和歌山・南部）</h2>
-    <pre id="weather">読み込み中...</pre>
+<div id="header">
+  <div id="header-inner">
+    <h1>🎣 釣り天気</h1>
+  </div>
+  <div id="spot-search-row">
+    <select id="pref-select">
+      <option value="">都道府県</option>
+    </select>
+    <input id="spot-input" type="text" placeholder="釣り場を検索..." autocomplete="off">
+    <button id="search-btn" onclick="openSpotList()">検索</button>
+  </div>
+  <div id="spot-list"></div>
+  <div id="current-spot">選択中: <span id="spot-name-label">---</span></div>
+  <div id="tabs">
+    <button class="tab-btn active" onclick="showTab('weather',this)">☀️ 天気</button>
+    <button class="tab-btn" onclick="showTab('tide',this)">🌊 潮汐</button>
+    <button class="tab-btn" onclick="showTab('wind',this)">💨 風マップ</button>
+    <button class="tab-btn" onclick="showTab('calendar',this)">📅 潮汐暦</button>
+  </div>
+</div>
+
+<!-- ── 天気タブ ── -->
+<div id="tab-weather" class="tab-pane active">
+  <div id="api-status">
+    <div id="api-dot"></div>
+    <span id="api-status-text">Open-Meteo 接続確認中...</span>
   </div>
 
-  <div class="section">
-    <h2>② 日の出・日没（串本）</h2>
-    <pre id="sun">読み込み中...</pre>
+  <div class="card">
+    <div class="card-title">朝マズメ・夕マズメ</div>
+    <div class="mazume-row" id="mazume-row">
+      <div class="loading">読み込み中...</div>
+    </div>
   </div>
 
-  <div class="section">
-    <h2>③ 潮汐API（要portコード設定）</h2>
-    <pre id="tide">tide736.netでportコードを確認後、tide.jsを設定してください</pre>
+  <div class="card">
+    <div class="card-title">3日間天気予報</div>
+    <div class="forecast-grid" id="forecast-grid">
+      <div class="loading" style="grid-column:1/-1">読み込み中...</div>
+    </div>
   </div>
+</div>
 
-  <script>
-    // ① 気象庁
-    fetch('/api/weather?code=300000')
-      .then(r => r.json())
-      .then(data => {
-        const ts = data[0].timeSeries[0];
-        const nanbu = ts.areas.find(a => a.area.name === '南部');
-        document.getElementById('weather').innerHTML =
-          `<span class="ok">✅ 取得成功</span>\n` +
-          `天気: ${nanbu?.weathers?.[0] ?? 'N/A'}\n` +
-          `風:   ${nanbu?.winds?.[0] ?? 'N/A'}\n` +
-          `波:   ${nanbu?.waves?.[0] ?? 'N/A'}`;
-      })
-      .catch(e => {
-        document.getElementById('weather').innerHTML = `<span class="err">❌ エラー: ${e.message}</span>`;
-      });
+<!-- ── 潮汐タブ ── -->
+<div id="tab-tide" class="tab-pane">
+  <div class="card">
+    <div class="card-title">今日の潮汐</div>
+    <div id="tide-type-badge"></div>
+    <div id="tide-chart-wrap">
+      <canvas id="tide-chart"></canvas>
+      <div id="tide-loading" class="loading">潮汐データ読み込み中...</div>
+    </div>
+    <div class="tide-meta" id="tide-meta"></div>
+  </div>
+  <div class="card" id="tide-detail-card">
+    <div class="card-title">満潮・干潮</div>
+    <div id="tide-peaks"></div>
+  </div>
+</div>
 
-    // ② 日の出・日没（串本）
-    fetch('/api/sun?lat=33.477&lon=135.856')
-      .then(r => r.json())
-      .then(data => {
-        document.getElementById('sun').innerHTML =
-          `<span class="ok">✅ 取得成功</span>\n` +
-          `日の出:    ${data.sunrise}\n` +
-          `日の入り:  ${data.sunset}\n` +
-          `朝マズメ:  ${data.mornStart} 〜 ${data.mornEnd}\n` +
-          `夕マズメ:  ${data.duskStart} 〜 ${data.duskEnd}`;
-      })
-      .catch(e => {
-        document.getElementById('sun').innerHTML = `<span class="err">❌ エラー: ${e.message}</span>`;
-      });
-  </script>
+<!-- ── 風マップタブ ── -->
+<div id="tab-wind" class="tab-pane" style="padding:0;">
+  <div id="windy-wrap">
+    <div id="windy-loading">💨 Windy 風マップを読み込み中...</div>
+    <iframe id="windy-frame" style="display:none;"
+      allowfullscreen
+      loading="lazy"
+      title="Windy 風マップ">
+    </iframe>
+  </div>
+  <div style="padding:10px 12px; font-size:12px; color:var(--muted);">
+    Powered by <a href="https://www.windy.com" style="color:var(--cyan);">Windy.com</a>
+  </div>
+</div>
+
+<!-- ── 潮汐カレンダータブ ── -->
+<div id="tab-calendar" class="tab-pane">
+  <div class="card">
+    <div id="cal-header">
+      <button class="cal-nav" onclick="calMove(-1)">‹</button>
+      <div id="cal-title"></div>
+      <button class="cal-nav" onclick="calMove(1)">›</button>
+    </div>
+    <div id="cal-grid"></div>
+    <div class="cal-legend">
+      <div class="cal-legend-item">🔴 大潮</div>
+      <div class="cal-legend-item">🟠 中潮</div>
+      <div class="cal-legend-item">🟢 小潮</div>
+      <div class="cal-legend-item">⚪ 長潮</div>
+      <div class="cal-legend-item">🔵 若潮</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// 状態管理
+// ═══════════════════════════════════════════════════════
+let spots = [];
+let currentSpot = null;
+let tideChartInst = null;
+let windyLoaded = false;
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth(); // 0-indexed
+
+// ═══════════════════════════════════════════════════════
+// 初期化
+// ═══════════════════════════════════════════════════════
+async function init() {
+  // PWA Service Worker 登録
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+
+  // スポットデータ読み込み
+  try {
+    const res = await fetch('/spots.json');
+    spots = await res.json();
+    buildPrefList();
+    // デフォルト：串本
+    const def = spots.find(s => s.id === 'kushimoto') || spots[0];
+    selectSpot(def);
+  } catch (e) {
+    console.error('spots.json load error', e);
+  }
+
+  // Open-Meteo 接続確認（currentSpotが設定された後に呼ばれる）
+}
+
+// ═══════════════════════════════════════════════════════
+// スポット選択
+// ═══════════════════════════════════════════════════════
+function selectSpot(spot) {
+  currentSpot = spot;
+  document.getElementById('spot-name-label').textContent = `${spot.name}（${spot.area}）`;
+  closeSpotList();
+
+  // アクティブなタブに応じてデータを再ロード
+  const activeTab = document.querySelector('.tab-pane.active');
+  if (activeTab) {
+    const id = activeTab.id.replace('tab-', '');
+    loadTabData(id);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// タブ切り替え
+// ═══════════════════════════════════════════════════════
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  loadTabData(name);
+}
+
+function loadTabData(name) {
+  if (!currentSpot) return;
+  if (name === 'weather') loadWeather();
+  else if (name === 'tide') loadTide();
+  else if (name === 'wind') loadWind();
+  else if (name === 'calendar') renderCalendar();
+}
+
+// ═══════════════════════════════════════════════════════
+// 都道府県リスト構築
+// ═══════════════════════════════════════════════════════
+function buildPrefList() {
+  const prefs = [...new Set(spots.map(s => s.prefecture))];
+  const sel = document.getElementById('pref-select');
+  prefs.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; opt.textContent = p;
+    sel.appendChild(opt);
+  });
+  sel.onchange = () => filterSpots();
+}
+
+function filterSpots() {
+  const pref = document.getElementById('pref-select').value;
+  const q = document.getElementById('spot-input').value.trim();
+  let list = spots;
+  if (pref) list = list.filter(s => s.prefecture === pref);
+  if (q) list = list.filter(s => s.name.includes(q) || s.area.includes(q));
+  renderSpotList(list);
+}
+
+function openSpotList() {
+  filterSpots();
+  document.getElementById('spot-list').classList.add('open');
+}
+
+function closeSpotList() {
+  document.getElementById('spot-list').classList.remove('open');
+}
+
+function renderSpotList(list) {
+  const el = document.getElementById('spot-list');
+  if (!list.length) {
+    el.innerHTML = '<div class="spot-item"><span class="spot-area">該当なし</span></div>';
+    el.classList.add('open');
+    return;
+  }
+  el.innerHTML = list.map(s => `
+    <div class="spot-item" onclick="selectSpot(spots.find(x=>x.id==='${s.id}'))">
+      <div class="spot-name">${s.name}</div>
+      <div class="spot-area">${s.prefecture} · ${s.area} · ${s.types.join(' ')}</div>
+    </div>
+  `).join('');
+  el.classList.add('open');
+}
+
+// 検索入力でリアルタイムフィルタ
+document.getElementById('spot-input').addEventListener('input', () => {
+  openSpotList();
+});
+
+// 外クリックで閉じる
+document.addEventListener('click', e => {
+  const header = document.getElementById('header');
+  if (!header.contains(e.target)) closeSpotList();
+});
+
+// ═══════════════════════════════════════════════════════
+// 天気タブ
+// ═══════════════════════════════════════════════════════
+const WMO_ICONS = {
+  0:'☀️', 1:'🌤', 2:'⛅', 3:'☁️',
+  45:'🌫', 48:'🌫',
+  51:'🌦', 53:'🌦', 55:'🌧',
+  61:'🌧', 63:'🌧', 65:'🌧',
+  71:'🌨', 73:'🌨', 75:'❄️',
+  80:'🌦', 81:'🌧', 82:'⛈',
+  95:'⛈', 96:'⛈', 99:'⛈',
+};
+const WIND_DIR = ['北','北北東','北東','東北東','東','東南東','南東','南南東','南','南南西','南西','西南西','西','西北西','北西','北北西'];
+function degToDir(deg) { return WIND_DIR[Math.round(deg / 22.5) % 16]; }
+
+async function loadWeather() {
+  if (!currentSpot) return;
+  const { lat, lon } = currentSpot;
+
+  // Open-Meteo 接続確認 & 天気データ取得
+  const dot = document.getElementById('api-dot');
+  const statusText = document.getElementById('api-status-text');
+  statusText.textContent = '接続確認中...';
+  dot.className = '';
+
+  try {
+    const [meteoRes, sunRes] = await Promise.all([
+      fetch(`/api/openmeteo?lat=${lat}&lon=${lon}`),
+      fetch(`/api/sun?lat=${lat}&lon=${lon}`)
+    ]);
+
+    if (!meteoRes.ok) throw new Error('Open-Meteo error');
+    const meteo = await meteoRes.json();
+    const sun = sunRes.ok ? await sunRes.json() : null;
+
+    dot.className = 'ok';
+    statusText.textContent = '✅ Open-Meteo 接続OK（無料APIキー不要）';
+
+    renderMazume(sun);
+    renderForecast(meteo);
+  } catch (e) {
+    dot.className = 'err';
+    statusText.textContent = '❌ 接続エラー: ' + e.message;
+    document.getElementById('forecast-grid').innerHTML = `<div class="error-msg" style="grid-column:1/-1">データ取得失敗</div>`;
+  }
+}
+
+function renderMazume(sun) {
+  const el = document.getElementById('mazume-row');
+  if (!sun || sun.error) {
+    el.innerHTML = '<div class="loading">データなし</div>';
+    return;
+  }
+  el.innerHTML = `
+    <div class="mazume-card">
+      <div class="label">🌅 朝マズメ</div>
+      <div class="time">${sun.mornStart}〜${sun.mornEnd}</div>
+      <div class="range">日の出 ${sun.sunrise}</div>
+    </div>
+    <div class="mazume-card">
+      <div class="label">🌇 夕マズメ</div>
+      <div class="time">${sun.duskStart}〜${sun.duskEnd}</div>
+      <div class="range">日没 ${sun.sunset}</div>
+    </div>
+  `;
+}
+
+function renderForecast(meteo) {
+  const el = document.getElementById('forecast-grid');
+  const daily = meteo.daily;
+  if (!daily) { el.innerHTML = '<div class="error-msg">データなし</div>'; return; }
+
+  const days = ['今日', '明日', '明後日'];
+  el.innerHTML = daily.time.slice(0, 3).map((date, i) => {
+    const code = daily.weathercode[i];
+    const icon = WMO_ICONS[code] || '🌡️';
+    const tmax = daily.temperature_2m_max[i]?.toFixed(0) ?? '--';
+    const tmin = daily.temperature_2m_min[i]?.toFixed(0) ?? '--';
+    const wind = daily.windspeed_10m_max[i]?.toFixed(1) ?? '--';
+    const wdir = daily.winddirection_10m_dominant?.[i];
+    const dirStr = wdir != null ? degToDir(wdir) : '';
+    const rain = daily.precipitation_sum[i]?.toFixed(1) ?? '--';
+    return `
+      <div class="forecast-day">
+        <div class="fday">${days[i] || date}</div>
+        <div class="ficon">${icon}</div>
+        <div class="ftemp">${tmax}° / ${tmin}°</div>
+        <div class="fwind">💨 ${wind}km/h ${dirStr}</div>
+        <div class="frain">☔ ${rain}mm</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// 潮汐タブ
+// ═══════════════════════════════════════════════════════
+async function loadTide() {
+  if (!currentSpot) return;
+  const port = currentSpot.tidePort;
+  const loading = document.getElementById('tide-loading');
+
+  loading.style.display = 'flex';
+  document.getElementById('tide-meta').innerHTML = '';
+  document.getElementById('tide-peaks').innerHTML = '';
+  document.getElementById('tide-type-badge').innerHTML = '';
+
+  try {
+    const res = await fetch(`/api/tide?port=${port}`);
+    if (!res.ok) throw new Error(`tide API error ${res.status}`);
+    const data = await res.json();
+    loading.style.display = 'none';
+    renderTideChart(data);
+  } catch (e) {
+    loading.textContent = '潮汐データ取得失敗。portコードを確認してください。';
+    // 潮汐の種類だけ旧暦計算で表示
+    const tideType = calcTideType(new Date());
+    document.getElementById('tide-type-badge').innerHTML =
+      `<span class="tide-badge ${tideType}">${tideType}</span>`;
+  }
+}
+
+function renderTideChart(data) {
+  // tide736.net のレスポンス形式に対応
+  // 期待するフォーマット: { hourly: [{hour, height}], peaks: [{time, height, type}] }
+  // または独自フォーマットの場合はパース
+  let hourly = [];
+  let peaks = [];
+
+  if (Array.isArray(data)) {
+    // 配列形式の場合
+    hourly = data;
+  } else if (data.hourly) {
+    hourly = data.hourly;
+    peaks = data.peaks || [];
+  } else if (data.tide) {
+    hourly = data.tide;
+  }
+
+  const tideType = calcTideType(new Date());
+  document.getElementById('tide-type-badge').innerHTML =
+    `<span class="tide-badge ${tideType}">${tideType}</span>`;
+
+  if (!hourly.length) {
+    document.getElementById('tide-loading').textContent = 'データ形式不明';
+    return;
+  }
+
+  const labels = hourly.map(h => h.hour != null ? `${h.hour}時` : String(h.time || h.h || ''));
+  const heights = hourly.map(h => h.height ?? h.level ?? h.cm ?? 0);
+
+  const canvas = document.getElementById('tide-chart');
+  if (tideChartInst) { tideChartInst.destroy(); tideChartInst = null; }
+
+  tideChartInst = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: heights,
+        borderColor: '#38bdf8',
+        backgroundColor: 'rgba(56,189,248,0.15)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 0,
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#7898b8', font: { size: 11 } }, grid: { color: '#1e3a5f' } },
+        y: { ticks: { color: '#7898b8', font: { size: 11 } }, grid: { color: '#1e3a5f' } }
+      }
+    }
+  });
+
+  // 満潮・干潮
+  if (!peaks.length) {
+    // 自動検出
+    for (let i = 1; i < heights.length - 1; i++) {
+      if (heights[i] > heights[i-1] && heights[i] > heights[i+1]) {
+        peaks.push({ label: labels[i], height: heights[i], type: '満潮' });
+      } else if (heights[i] < heights[i-1] && heights[i] < heights[i+1]) {
+        peaks.push({ label: labels[i], height: heights[i], type: '干潮' });
+      }
+    }
+  }
+
+  const maxH = Math.max(...heights);
+  const minH = Math.min(...heights);
+
+  document.getElementById('tide-meta').innerHTML = `
+    <div class="tide-meta-item"><div class="label">最高潮位</div><div class="val">${maxH}cm</div></div>
+    <div class="tide-meta-item"><div class="label">最低潮位</div><div class="val">${minH}cm</div></div>
+  `;
+
+  document.getElementById('tide-peaks').innerHTML = peaks.slice(0, 4).map(p =>
+    `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:14px;">
+      <span>${p.type === '満潮' ? '↑' : '↓'} ${p.type}</span>
+      <span>${p.label || p.time || ''}</span>
+      <span style="color:var(--cyan)">${p.height}cm</span>
+    </div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// 風マップ（Windy）
+// ═══════════════════════════════════════════════════════
+function loadWind() {
+  if (!currentSpot) return;
+  const { lat, lon } = currentSpot;
+
+  const loading = document.getElementById('windy-loading');
+  const frame = document.getElementById('windy-frame');
+
+  if (windyLoaded && frame.dataset.spot === currentSpot.id) return;
+
+  loading.style.display = 'flex';
+  frame.style.display = 'none';
+
+  const src = `https://embed.windy.com/embed2.html` +
+    `?lat=${lat}&lon=${lon}` +
+    `&detailLat=${lat}&detailLon=${lon}` +
+    `&width=800&height=440&zoom=8` +
+    `&level=surface&overlay=wind&product=ecmwf` +
+    `&menu=&message=true&marker=true` +
+    `&calendar=now&pressure=&type=map` +
+    `&location=coordinates&detail=` +
+    `&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
+
+  frame.src = src;
+  frame.dataset.spot = currentSpot.id;
+
+  frame.onload = () => {
+    loading.style.display = 'none';
+    frame.style.display = 'block';
+    windyLoaded = true;
+  };
+  frame.onerror = () => {
+    loading.textContent = '風マップの読み込みに失敗しました';
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// 潮汐カレンダー
+// ═══════════════════════════════════════════════════════
+
+// 旧暦ベースの潮の種類計算
+// 月齢0,1,14,15,16,29→大潮 / 6,7,8,21,22,23→小潮 / 12,13,27,28→長潮→若潮 / それ以外→中潮
+function calcTideType(date) {
+  const age = calcMoonAge(date);
+  const a = Math.round(age) % 30;
+  if ([0,1,14,15,16,28,29].includes(a)) return '大潮';
+  if ([6,7,8,21,22,23].includes(a)) return '小潮';
+  if ([11,12,26,27].includes(a)) return '長潮';
+  if ([13,28].includes(a)) return '若潮';
+  return '中潮';
+}
+
+function calcMoonAge(date) {
+  // 簡易月齢計算（新月2000-01-06基準）
+  const known = new Date(2000, 0, 6, 18, 14);
+  const diff = (date - known) / (1000 * 60 * 60 * 24);
+  return ((diff % 29.53053) + 29.53053) % 29.53053;
+}
+
+const TIDE_EMOJI = { '大潮':'🔴', '中潮':'🟠', '小潮':'🟢', '長潮':'⚪', '若潮':'🔵' };
+
+function renderCalendar() {
+  const title = document.getElementById('cal-title');
+  title.textContent = `${calYear}年${calMonth + 1}月`;
+
+  const grid = document.getElementById('cal-grid');
+  const today = new Date();
+
+  // 曜日ヘッダー
+  const dows = ['日','月','火','水','木','金','土'];
+  let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  // 月初曜日
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(calYear, calMonth, d);
+    const tideType = calcTideType(date);
+    const emoji = TIDE_EMOJI[tideType];
+    const isToday = (d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear());
+    html += `
+      <div class="cal-day${isToday ? ' today' : ''}" onclick="calDayClick(${d})">
+        <div class="cday">${d}</div>
+        <div class="ctide-dot">${emoji}</div>
+        <div class="ctide" style="color:var(--muted)">${tideType}</div>
+      </div>
+    `;
+  }
+
+  grid.innerHTML = html;
+}
+
+function calMove(dir) {
+  calMonth += dir;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function calDayClick(day) {
+  // 潮汐タブに切り替え
+  const tideBtn = document.querySelectorAll('.tab-btn')[1];
+  showTab('tide', tideBtn);
+}
+
+// ═══════════════════════════════════════════════════════
+// 起動
+// ═══════════════════════════════════════════════════════
+init();
+</script>
 </body>
 </html>

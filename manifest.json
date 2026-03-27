@@ -1,0 +1,28 @@
+{
+  "name": "釣り天気",
+  "short_name": "釣り天気",
+  "description": "日本全国の釣り場の天気・潮汐・風情報",
+  "theme_color": "#0b1120",
+  "background_color": "#0b1120",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "start_url": "/",
+  "scope": "/",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["weather", "lifestyle"],
+  "screenshots": []
+}
