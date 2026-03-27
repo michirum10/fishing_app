@@ -56,6 +56,14 @@
       background: var(--cyan-dark); color: #fff; border: none;
       border-radius: 8px; padding: 7px 14px; font-size: 14px; cursor: pointer;
     }
+    #gps-btn {
+      background: var(--surface2); color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; padding: 7px 10px; font-size: 14px; cursor: pointer;
+      flex-shrink: 0; white-space: nowrap;
+    }
+    #gps-btn:disabled { opacity: 0.5; cursor: default; }
+    .geo-result-item { border-left: 3px solid var(--cyan); }
+    .geo-result-item .spot-area { color: var(--cyan); }
 
     /* ── Spot List Dropdown ── */
     #spot-list {
@@ -231,8 +239,9 @@
     <select id="pref-select">
       <option value="">都道府県</option>
     </select>
-    <input id="spot-input" type="text" placeholder="釣り場を検索..." autocomplete="off">
+    <input id="spot-input" type="text" placeholder="釣り場・地名を検索..." autocomplete="off">
     <button id="search-btn" onclick="openSpotList()">検索</button>
+    <button id="gps-btn" onclick="getGpsLocation()">📍 現在地</button>
   </div>
   <div id="spot-list"></div>
   <div id="current-spot">選択中: <span id="spot-name-label">---</span></div>
@@ -406,8 +415,8 @@ function filterSpots() {
   const q = document.getElementById('spot-input').value.trim();
   let list = spots;
   if (pref) list = list.filter(s => s.prefecture === pref);
-  if (q) list = list.filter(s => s.name.includes(q) || s.area.includes(q));
-  renderSpotList(list);
+  if (q) list = list.filter(s => s.name.includes(q) || s.area.includes(q) || s.prefecture.includes(q));
+  renderSpotList(list, q);
 }
 
 function openSpotList() {
@@ -419,20 +428,45 @@ function closeSpotList() {
   document.getElementById('spot-list').classList.remove('open');
 }
 
-function renderSpotList(list) {
+function renderSpotList(list, query) {
   const el = document.getElementById('spot-list');
-  if (!list.length) {
-    el.innerHTML = '<div class="spot-item"><span class="spot-area">該当なし</span></div>';
-    el.classList.add('open');
-    return;
-  }
-  el.innerHTML = list.map(s => `
+  let html = list.slice(0, 15).map(s => `
     <div class="spot-item" onclick="selectSpot(spots.find(x=>x.id==='${s.id}'))">
       <div class="spot-name">${s.name}</div>
       <div class="spot-area">${s.prefecture} · ${s.area} · ${s.types.join(' ')}</div>
     </div>
   `).join('');
+
+  if (!list.length && query) {
+    html = `<div class="spot-item" style="color:var(--muted);font-size:13px;">釣り場が見つかりません — 地名で検索中...</div>`;
+  }
+
+  el.innerHTML = html;
   el.classList.add('open');
+
+  // 釣り場に一致がなくキーワードがある場合、地名ジオコーディングを非同期で追加
+  if (query && list.length < 3) {
+    clearTimeout(geocodeTimer);
+    geocodeTimer = setTimeout(async () => {
+      const geoResults = await geocodeSearch(query);
+      if (!geoResults || !geoResults.length) return;
+      const geoHtml = geoResults.map((r, i) => `
+        <div class="spot-item geo-result-item" onclick="selectGeoResult(${i})">
+          <div class="spot-name">📍 ${r.name}</div>
+          <div class="spot-area">${r.fullName.split(',').slice(0,3).join(', ')}</div>
+        </div>
+      `).join('');
+      el.innerHTML += geoHtml;
+      window._geoResults = geoResults;
+    }, 600);
+  }
+}
+
+function selectGeoResult(i) {
+  const r = window._geoResults?.[i];
+  if (!r) return;
+  geocodeVirtualSpot = createVirtualSpot(r.name, r.lat, r.lon);
+  selectSpot(geocodeVirtualSpot);
 }
 
 // 検索入力でリアルタイムフィルタ
@@ -553,6 +587,15 @@ async function loadTide() {
   document.getElementById('tide-peaks').innerHTML = '';
   document.getElementById('tide-type-badge').innerHTML = '';
 
+  // カスタム地点（現在地・地名検索）は潮汐データなし
+  if (currentSpot.isCustom || !port) {
+    const tideType = calcTideType(new Date());
+    document.getElementById('tide-type-badge').innerHTML =
+      `<span class="tide-badge ${tideType}">${tideType}</span>`;
+    loading.textContent = '📍 カスタム地点は潮汐グラフ非対応です。釣り場を選択すると表示されます。';
+    return;
+  }
+
   try {
     const res = await fetch(`/api/tide?port=${port}`);
     if (!res.ok) throw new Error(`tide API error ${res.status}`);
@@ -664,7 +707,8 @@ function loadWind() {
   const loading = document.getElementById('windy-loading');
   const frame = document.getElementById('windy-frame');
 
-  if (windyLoaded && frame.dataset.spot === currentSpot.id) return;
+  const spotKey = `${currentSpot.lat.toFixed(3)}_${currentSpot.lon.toFixed(3)}`;
+  if (windyLoaded && frame.dataset.spot === spotKey) return;
 
   loading.style.display = 'flex';
   frame.style.display = 'none';
@@ -680,7 +724,7 @@ function loadWind() {
     `&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1`;
 
   frame.src = src;
-  frame.dataset.spot = currentSpot.id;
+  frame.dataset.spot = spotKey;
 
   frame.onload = () => {
     loading.style.display = 'none';
@@ -761,6 +805,119 @@ function calDayClick(day) {
   // 潮汐タブに切り替え
   const tideBtn = document.querySelectorAll('.tab-btn')[1];
   showTab('tide', tideBtn);
+}
+
+// ═══════════════════════════════════════════════════════
+// 現在地取得（GPS）
+// ═══════════════════════════════════════════════════════
+function getGpsLocation() {
+  if (!navigator.geolocation) {
+    alert('このブラウザは位置情報に対応していません');
+    return;
+  }
+  const btn = document.getElementById('gps-btn');
+  btn.textContent = '⏳ 取得中...';
+  btn.disabled = true;
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      btn.textContent = '📍 現在地';
+      btn.disabled = false;
+      const { latitude: lat, longitude: lon } = pos.coords;
+      // 最寄り釣り場を検索
+      const nearest = findNearestSpot(lat, lon);
+      const distKm = haversine(lat, lon, nearest.lat, nearest.lon).toFixed(1);
+      // 現在地の仮想スポットと最寄り釣り場の両方を提示
+      const gpsSpot = createVirtualSpot(`現在地 (${lat.toFixed(3)}, ${lon.toFixed(3)})`, lat, lon);
+      showGpsResults(gpsSpot, nearest, distKm);
+    },
+    err => {
+      btn.textContent = '📍 現在地';
+      btn.disabled = false;
+      const msgs = { 1: '位置情報の許可が必要です', 2: '位置情報を取得できません', 3: 'タイムアウトしました' };
+      alert(msgs[err.code] || '位置情報エラー');
+    },
+    { timeout: 10000, maximumAge: 60000 }
+  );
+}
+
+function showGpsResults(gpsSpot, nearest, distKm) {
+  const el = document.getElementById('spot-list');
+  el.innerHTML = `
+    <div class="spot-item geo-result-item" onclick="selectSpot(gpsVirtualSpot)">
+      <div class="spot-name">📍 現在地の天気を見る</div>
+      <div class="spot-area">緯度 ${gpsSpot.lat.toFixed(4)} / 経度 ${gpsSpot.lon.toFixed(4)}</div>
+    </div>
+    <div class="spot-item" onclick="selectSpot(spots.find(x=>x.id==='${nearest.id}'))">
+      <div class="spot-name">🎣 最寄り釣り場: ${nearest.name}</div>
+      <div class="spot-area">${nearest.prefecture} · 直線距離 ${distKm}km · ${nearest.types.join(' ')}</div>
+    </div>
+  `;
+  gpsVirtualSpot = gpsSpot;
+  el.classList.add('open');
+}
+
+let gpsVirtualSpot = null;
+let geocodeVirtualSpot = null;
+
+// ═══════════════════════════════════════════════════════
+// 地名・住所ジオコーディング（Nominatim/OpenStreetMap）
+// ═══════════════════════════════════════════════════════
+let geocodeTimer = null;
+
+async function geocodeSearch(query) {
+  if (!query || query.length < 2) return;
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&accept-language=ja&countrycodes=jp&limit=3`;
+    const res = await fetch(url, { headers: { 'Accept-Language': 'ja' } });
+    if (!res.ok) return;
+    const results = await res.json();
+    return results.map(r => ({
+      name: r.display_name.split(',')[0],
+      fullName: r.display_name,
+      lat: parseFloat(r.lat),
+      lon: parseFloat(r.lon),
+    }));
+  } catch {
+    return [];
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// バーチャルスポット（釣り場登録なしの任意地点）
+// ═══════════════════════════════════════════════════════
+function createVirtualSpot(name, lat, lon) {
+  return {
+    id: 'custom_' + Date.now(),
+    name,
+    prefecture: 'カスタム',
+    area: '任意の地点',
+    lat,
+    lon,
+    jmaCode: null,
+    tidePort: null,
+    types: ['カスタム地点'],
+    isCustom: true,
+  };
+}
+
+// ═══════════════════════════════════════════════════════
+// 距離計算（ハーバーサイン公式）
+// ═══════════════════════════════════════════════════════
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 +
+    Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function findNearestSpot(lat, lon) {
+  return spots.reduce((best, s) => {
+    const d = haversine(lat, lon, s.lat, s.lon);
+    return d < haversine(lat, lon, best.lat, best.lon) ? s : best;
+  }, spots[0]);
 }
 
 // ═══════════════════════════════════════════════════════
