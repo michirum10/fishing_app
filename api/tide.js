@@ -1,12 +1,19 @@
 // api/tide.js
-// 潮汐APIプロキシ（tide736.net）
-// 使用前にtide736.netでportコードを確認してください
+// 潮汐APIプロキシ（api.tide736.net）
+// パラメータ: pc=都道府県コード(JIS番号) hc=港コード(tide736独自番号)
 
 export default async function handler(req, res) {
-  const { port, year, month, day } = req.query;
+  const { pc, hc, year, month, day } = req.query;
 
-  if (!port) {
-    return res.status(400).json({ error: 'port is required' });
+  if (!pc || !hc) {
+    return res.status(400).json({ error: 'pc (都道府県コード) と hc (港コード) は必須です' });
+  }
+
+  // バリデーション
+  const pcNum = parseInt(pc, 10);
+  const hcNum = parseInt(hc, 10);
+  if (isNaN(pcNum) || pcNum < 1 || pcNum > 47 || isNaN(hcNum) || hcNum < 1) {
+    return res.status(400).json({ error: 'pc/hc の値が不正です' });
   }
 
   // 日付デフォルト：今日（JST）
@@ -16,14 +23,16 @@ export default async function handler(req, res) {
   const d = day   || String(now.getDate()).padStart(2, '0');
 
   try {
-    // tide736.net API
-    // ※ 事前にtide736.netでportコードを確認してください
-    const url = `https://tide736.net/get_tide.php?port=${port}&year=${y}&month=${m}&day=${d}`;
+    const url = `https://api.tide736.net/get_tide.php?pc=${pcNum}&hc=${hcNum}&yr=${y}&mn=${m}&dy=${d}&rg=day`;
     const response = await fetch(url);
 
     if (!response.ok) throw new Error(`tide736 returned ${response.status}`);
 
     const data = await response.json();
+
+    if (data.status !== 1) {
+      throw new Error(data.message || '潮汐データ取得失敗');
+    }
 
     // 潮汐は1日変わらないので長めにキャッシュ
     res.setHeader('Cache-Control', 's-maxage=86400');

@@ -579,66 +579,85 @@ function renderForecast(meteo) {
 // ═══════════════════════════════════════════════════════
 async function loadTide() {
   if (!currentSpot) return;
-  const port = currentSpot.tidePort;
   const loading = document.getElementById('tide-loading');
 
   loading.style.display = 'flex';
+  loading.textContent = '潮汐データ読み込み中...';
   document.getElementById('tide-meta').innerHTML = '';
   document.getElementById('tide-peaks').innerHTML = '';
   document.getElementById('tide-type-badge').innerHTML = '';
 
   // カスタム地点（現在地・地名検索）は潮汐データなし
-  if (currentSpot.isCustom || !port) {
+  if (currentSpot.isCustom) {
     const tideType = calcTideType(new Date());
     document.getElementById('tide-type-badge').innerHTML =
-      `<span class="tide-badge ${tideType}">${tideType}</span>`;
+      `<span class="tide-badge ${tideType}">${tideType}（月齢推定）</span>`;
     loading.textContent = '📍 カスタム地点は潮汐グラフ非対応です。釣り場を選択すると表示されます。';
     return;
   }
 
+  const pc = currentSpot.tidePc;
+  const hc = currentSpot.tideHc;
+
+  if (!pc || hc == null) {
+    const tideType = calcTideType(new Date());
+    document.getElementById('tide-type-badge').innerHTML =
+      `<span class="tide-badge ${tideType}">${tideType}（月齢推定）</span>`;
+    loading.innerHTML = `⚠️ 港コード(hc)未設定<br>
+      <a href="https://tide736.net" target="_blank" style="color:var(--cyan)">tide736.net</a>
+      でこの港を選び、URLの <code>hc=数字</code> を確認してください。<br>
+      <small style="color:var(--muted)">pc=${pc ?? '?'} は設定済み / hc が必要です</small>`;
+    return;
+  }
+
   try {
-    const res = await fetch(`/api/tide?port=${port}`);
+    const res = await fetch(`/api/tide?pc=${pc}&hc=${hc}`);
     if (!res.ok) throw new Error(`tide API error ${res.status}`);
     const data = await res.json();
     loading.style.display = 'none';
     renderTideChart(data);
   } catch (e) {
-    loading.textContent = '潮汐データ取得失敗。portコードを確認してください。';
-    // 潮汐の種類だけ旧暦計算で表示
+    loading.textContent = `潮汐データ取得失敗: ${e.message}`;
     const tideType = calcTideType(new Date());
     document.getElementById('tide-type-badge').innerHTML =
-      `<span class="tide-badge ${tideType}">${tideType}</span>`;
+      `<span class="tide-badge ${tideType}">${tideType}（月齢推定）</span>`;
   }
 }
 
 function renderTideChart(data) {
-  // tide736.net のレスポンス形式に対応
-  // 期待するフォーマット: { hourly: [{hour, height}], peaks: [{time, height, type}] }
-  // または独自フォーマットの場合はパース
-  let hourly = [];
-  let peaks = [];
+  // tide736.net API レスポンス仕様:
+  // data.tide.chart["YYYY-MM-DD"].tide   = [{time, unix, cm}]  毎時水位
+  // data.tide.chart["YYYY-MM-DD"].edd    = [{time, unix, cm}]  干潮
+  // data.tide.chart["YYYY-MM-DD"].flood  = [{time, unix, cm}]  満潮
+  // data.tide.chart["YYYY-MM-DD"].moon.title = 潮名（大潮/中潮/小潮/長潮/若潮）
+  // data.tide.chart["YYYY-MM-DD"].sun.rise / sun.set = 日の出/日没
 
-  if (Array.isArray(data)) {
-    // 配列形式の場合
-    hourly = data;
-  } else if (data.hourly) {
-    hourly = data.hourly;
-    peaks = data.peaks || [];
-  } else if (data.tide) {
-    hourly = data.tide;
-  }
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+  const dateKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const chart = data?.tide?.chart?.[dateKey];
 
-  const tideType = calcTideType(new Date());
-  document.getElementById('tide-type-badge').innerHTML =
-    `<span class="tide-badge ${tideType}">${tideType}</span>`;
-
-  if (!hourly.length) {
-    document.getElementById('tide-loading').textContent = 'データ形式不明';
+  if (!chart) {
+    document.getElementById('tide-loading').textContent = 'レスポンス形式不明 (dateKey: ' + dateKey + ')';
     return;
   }
 
-  const labels = hourly.map(h => h.hour != null ? `${h.hour}時` : String(h.time || h.h || ''));
-  const heights = hourly.map(h => h.height ?? h.level ?? h.cm ?? 0);
+  // 潮の種類（APIの正式値を優先、なければ月齢推定）
+  const moonTitle = chart.moon?.title || calcTideType(new Date());
+  document.getElementById('tide-type-badge').innerHTML =
+    `<span class="tide-badge ${moonTitle}">${moonTitle}</span>`;
+
+  const hourly = chart.tide || [];
+  const edd   = chart.edd   || [];  // 干潮
+  const flood = chart.flood || [];  // 満潮
+
+  if (!hourly.length) {
+    document.getElementById('tide-loading').textContent = '潮汐データが空です';
+    return;
+  }
+
+  const labels  = hourly.map(h => h.time);
+  const heights = hourly.map(h => h.cm);
+  const nowHour = now.getHours();
 
   const canvas = document.getElementById('tide-chart');
   if (tideChartInst) { tideChartInst.destroy(); tideChartInst = null; }
@@ -650,7 +669,7 @@ function renderTideChart(data) {
       datasets: [{
         data: heights,
         borderColor: '#38bdf8',
-        backgroundColor: 'rgba(56,189,248,0.15)',
+        backgroundColor: 'rgba(56,189,248,0.12)',
         fill: true,
         tension: 0.4,
         pointRadius: 0,
@@ -660,26 +679,18 @@ function renderTideChart(data) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: { display: false },
+        annotation: {},
+      },
       scales: {
-        x: { ticks: { color: '#7898b8', font: { size: 11 } }, grid: { color: '#1e3a5f' } },
+        x: { ticks: { color: '#7898b8', font: { size: 11 }, maxTicksLimit: 8 }, grid: { color: '#1e3a5f' } },
         y: { ticks: { color: '#7898b8', font: { size: 11 } }, grid: { color: '#1e3a5f' } }
       }
     }
   });
 
-  // 満潮・干潮
-  if (!peaks.length) {
-    // 自動検出
-    for (let i = 1; i < heights.length - 1; i++) {
-      if (heights[i] > heights[i-1] && heights[i] > heights[i+1]) {
-        peaks.push({ label: labels[i], height: heights[i], type: '満潮' });
-      } else if (heights[i] < heights[i-1] && heights[i] < heights[i+1]) {
-        peaks.push({ label: labels[i], height: heights[i], type: '干潮' });
-      }
-    }
-  }
-
+  // 満潮(flood) / 干潮(edd) — APIから正式値を使用
   const maxH = Math.max(...heights);
   const minH = Math.min(...heights);
 
@@ -688,13 +699,30 @@ function renderTideChart(data) {
     <div class="tide-meta-item"><div class="label">最低潮位</div><div class="val">${minH}cm</div></div>
   `;
 
-  document.getElementById('tide-peaks').innerHTML = peaks.slice(0, 4).map(p =>
-    `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:14px;">
-      <span>${p.type === '満潮' ? '↑' : '↓'} ${p.type}</span>
-      <span>${p.label || p.time || ''}</span>
-      <span style="color:var(--cyan)">${p.height}cm</span>
-    </div>`
-  ).join('');
+  // 満潮・干潮をマージしてtime順にソート
+  const peaks = [
+    ...flood.map(p => ({ ...p, type: '満潮', icon: '↑', color: '#38bdf8' })),
+    ...edd.map(p =>   ({ ...p, type: '干潮', icon: '↓', color: '#7898b8' })),
+  ].sort((a, b) => a.time.localeCompare(b.time));
+
+  document.getElementById('tide-peaks').innerHTML = peaks.length
+    ? peaks.map(p =>
+        `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;">
+          <span style="color:${p.color}">${p.icon} ${p.type}</span>
+          <span>${p.time}</span>
+          <span style="color:var(--cyan);font-weight:600">${p.cm}cm</span>
+        </div>`
+      ).join('')
+    : '<div style="color:var(--muted);font-size:13px;">満干潮データなし</div>';
+
+  // 月の情報も表示（輝面・月齢）
+  const moon = chart.moon;
+  if (moon) {
+    document.getElementById('tide-meta').innerHTML += `
+      <div class="tide-meta-item"><div class="label">月齢</div><div class="val">${parseFloat(moon.age).toFixed(1)}</div></div>
+      <div class="tide-meta-item"><div class="label">輝面</div><div class="val">${Math.round(moon.brightness * 100)}%</div></div>
+    `;
+  }
 }
 
 // ═══════════════════════════════════════════════════════
