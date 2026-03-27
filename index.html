@@ -577,6 +577,17 @@ function renderForecast(meteo) {
 // ═══════════════════════════════════════════════════════
 // 潮汐タブ
 // ═══════════════════════════════════════════════════════
+// 海しるAPI で解決したhcをキャッシュ（LocalStorage: "tideHc_<spotId>"）
+function getCachedHc(spotId) {
+  try {
+    const v = localStorage.getItem(`tideHc_${spotId}`);
+    return v ? JSON.parse(v) : null;
+  } catch { return null; }
+}
+function setCachedHc(spotId, pc, hc) {
+  try { localStorage.setItem(`tideHc_${spotId}`, JSON.stringify({ pc, hc })); } catch {}
+}
+
 async function loadTide() {
   if (!currentSpot) return;
   const loading = document.getElementById('tide-loading');
@@ -587,34 +598,108 @@ async function loadTide() {
   document.getElementById('tide-peaks').innerHTML = '';
   document.getElementById('tide-type-badge').innerHTML = '';
 
-  // カスタム地点（現在地・地名検索）は潮汐データなし
+  // カスタム地点（現在地・地名検索）— 海しるAPIで最寄り地点を探す
   if (currentSpot.isCustom) {
+    loading.textContent = '🌊 最寄り潮汐観測地点を検索中（海しるAPI）...';
+    const resolved = await resolveTideViaKaishiru(currentSpot.lat, currentSpot.lon, null);
+    if (resolved) return;
     const tideType = calcTideType(new Date());
     document.getElementById('tide-type-badge').innerHTML =
       `<span class="tide-badge ${tideType}">${tideType}（月齢推定）</span>`;
-    loading.textContent = '📍 カスタム地点は潮汐グラフ非対応です。釣り場を選択すると表示されます。';
+    loading.textContent = '📍 カスタム地点の潮汐データを取得できませんでした。';
     return;
   }
 
   const pc = currentSpot.tidePc;
-  const hc = currentSpot.tideHc;
+  let hc = currentSpot.tideHc;
 
-  if (!pc || hc == null) {
+  // hc が未設定の場合、まずキャッシュを確認
+  if (hc == null) {
+    const cached = getCachedHc(currentSpot.id);
+    if (cached) { hc = cached.hc; }
+  }
+
+  // それでも未設定なら海しるAPIで自動解決を試みる
+  if (hc == null) {
+    loading.textContent = '🌊 海しるAPIで最寄り港を自動検索中...';
+    const resolved = await resolveTideViaKaishiru(currentSpot.lat, currentSpot.lon, currentSpot.id);
+    if (resolved) return;
+    // 自動解決できなかった場合
     const tideType = calcTideType(new Date());
     document.getElementById('tide-type-badge').innerHTML =
       `<span class="tide-badge ${tideType}">${tideType}（月齢推定）</span>`;
-    loading.innerHTML = `⚠️ 港コード(hc)未設定<br>
+    loading.innerHTML = `⚠️ 港コード(hc)が未設定、かつ海しるAPIキーが未設定です<br>
       <a href="https://tide736.net" target="_blank" style="color:var(--cyan)">tide736.net</a>
-      でこの港を選び、URLの <code>hc=数字</code> を確認してください。<br>
-      <small style="color:var(--muted)">pc=${pc ?? '?'} は設定済み / hc が必要です</small>`;
+      でこの港を選び URLの <code>hc=数字</code> を確認するか、<br>
+      <a href="https://portal.msil.go.jp" target="_blank" style="color:var(--cyan)">portal.msil.go.jp</a>
+      で海しるAPIキーを取得して Vercel に設定してください。<br>
+      <small style="color:var(--muted)">環境変数: MSIL_SUBSCRIPTION_KEY</small>`;
     return;
   }
 
+  await fetchAndRenderTide(pc, hc);
+}
+
+// 海しるAPI経由でhcを自動解決してチャートを表示
+// 成功時 true を返す
+async function resolveTideViaKaishiru(lat, lon, spotId) {
+  const loading = document.getElementById('tide-loading');
+  try {
+    const res = await fetch(`/api/msil?lat=${lat}&lon=${lon}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      if (err.configured === false) {
+        // キー未設定 → falseを返して呼び元でフォールバック処理
+        return false;
+      }
+      throw new Error(err.error || `status ${res.status}`);
+    }
+    const data = await res.json();
+    const nearest = data.nearest;
+
+    if (!nearest) {
+      loading.textContent = '⚠️ 近くに潮汐観測地点が見つかりませんでした（100km以内）';
+      return true; // handled
+    }
+
+    // tide736.net の hc が解決できた場合はチャートを表示
+    if (nearest.pc != null && nearest.hc != null) {
+      if (spotId) setCachedHc(spotId, nearest.pc, nearest.hc);
+      await fetchAndRenderTide(nearest.pc, nearest.hc, nearest.name);
+      return true;
+    }
+
+    // hcは解決できなかったが公式リンクは取得できた
+    const distStr = nearest.dist != null ? `（約${nearest.dist.toFixed(0)}km）` : '';
+    const stationName = nearest.name || '最寄り潮汐観測地点';
+    const linkHtml = nearest.linkUrl
+      ? `<a href="${nearest.linkUrl}" target="_blank" style="color:var(--cyan)">${stationName}の潮汐予報を確認 →</a>`
+      : `<span style="color:var(--muted)">${stationName}${distStr}</span>`;
+
+    const tideType = calcTideType(new Date());
+    document.getElementById('tide-type-badge').innerHTML =
+      `<span class="tide-badge ${tideType}">${tideType}（月齢推定）</span>`;
+    loading.innerHTML = `🌊 海しるAPI: ${stationName}${distStr}<br>${linkHtml}<br>
+      <small style="color:var(--muted)">※ 公式リンク先で詳細な潮汐予報を確認できます</small>`;
+    return true;
+
+  } catch (e) {
+    console.warn('msil resolve failed:', e.message);
+    return false;
+  }
+}
+
+async function fetchAndRenderTide(pc, hc, stationName) {
+  const loading = document.getElementById('tide-loading');
   try {
     const res = await fetch(`/api/tide?pc=${pc}&hc=${hc}`);
     if (!res.ok) throw new Error(`tide API error ${res.status}`);
     const data = await res.json();
     loading.style.display = 'none';
+    if (stationName) {
+      document.getElementById('tide-meta').innerHTML =
+        `<div class="tide-meta-item" style="grid-column:1/-1"><div class="label">観測地点</div><div class="val" style="font-size:13px">${stationName}（海しるAPI）</div></div>`;
+    }
     renderTideChart(data);
   } catch (e) {
     loading.textContent = `潮汐データ取得失敗: ${e.message}`;
