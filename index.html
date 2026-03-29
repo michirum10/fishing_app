@@ -592,7 +592,7 @@ async function loadTide() {
   if (!currentSpot) return;
   const loading = document.getElementById('tide-loading');
 
-  loading.style.display = 'flex';
+  loading.style.display = 'block';
   loading.textContent = '潮汐データ読み込み中...';
   document.getElementById('tide-meta').innerHTML = '';
   document.getElementById('tide-peaks').innerHTML = '';
@@ -628,12 +628,13 @@ async function loadTide() {
     const tideType = calcTideType(new Date());
     document.getElementById('tide-type-badge').innerHTML =
       `<span class="tide-badge ${tideType}">${tideType}（月齢推定）</span>`;
-    loading.innerHTML = `⚠️ 港コード(hc)が未設定、かつ海しるAPIキーが未設定です<br>
-      <a href="https://tide736.net" target="_blank" style="color:var(--cyan)">tide736.net</a>
-      でこの港を選び URLの <code>hc=数字</code> を確認するか、<br>
-      <a href="https://portal.msil.go.jp" target="_blank" style="color:var(--cyan)">portal.msil.go.jp</a>
-      で海しるAPIキーを取得して Vercel に設定してください。<br>
-      <small style="color:var(--muted)">環境変数: MSIL_SUBSCRIPTION_KEY</small>`;
+    loading.style.display = 'block';
+    loading.innerHTML = `<p>⚠️ 港コード(hc)が未設定、かつ海しるAPIキーが未設定です</p>
+      <p style="margin-top:8px"><a href="https://tide736.net" target="_blank" style="color:var(--cyan)">tide736.net</a>
+      でこの港を選び URLの <code>hc=数字</code> を確認するか、</p>
+      <p style="margin-top:8px"><a href="https://portal.msil.go.jp" target="_blank" style="color:var(--cyan)">portal.msil.go.jp</a>
+      で海しるAPIキーを取得して Vercel に設定してください。</p>
+      <p style="margin-top:8px;color:var(--muted);font-size:12px">環境変数: MSIL_SUBSCRIPTION_KEY</p>`;
     return;
   }
 
@@ -679,8 +680,10 @@ async function resolveTideViaKaishiru(lat, lon, spotId) {
     const tideType = calcTideType(new Date());
     document.getElementById('tide-type-badge').innerHTML =
       `<span class="tide-badge ${tideType}">${tideType}（月齢推定）</span>`;
-    loading.innerHTML = `🌊 海しるAPI: ${stationName}${distStr}<br>${linkHtml}<br>
-      <small style="color:var(--muted)">※ 公式リンク先で詳細な潮汐予報を確認できます</small>`;
+    loading.style.display = 'block';
+    loading.innerHTML = `<p>🌊 海しるAPI: ${stationName}${distStr}</p>
+      <p style="margin-top:8px">${linkHtml}</p>
+      <p style="margin-top:8px;color:var(--muted);font-size:12px">※ 公式リンク先で詳細な潮汐予報を確認できます</p>`;
     return true;
 
   } catch (e) {
