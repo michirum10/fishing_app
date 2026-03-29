@@ -9,19 +9,29 @@
     "jmaCode": "016000",
     "jmaArea": "後志地方",
     "tidePort": "yoichi",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 1,
+    "tideHc": null
   },
   {
     "id": "otaru",
     "name": "小樽港",
     "prefecture": "北海道",
     "area": "北海道石狩",
-    "lat": 43.190,
+    "lat": 43.19,
     "lon": 140.995,
     "jmaCode": "016000",
     "jmaArea": "石狩・空知・後志地方",
     "tidePort": "otaru",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 1,
+    "tideHc": null
   },
   {
     "id": "kushiro",
@@ -33,7 +43,12 @@
     "jmaCode": "014000",
     "jmaArea": "釧路地方",
     "tidePort": "kushiro",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 1,
+    "tideHc": null
   },
   {
     "id": "hakodate",
@@ -45,7 +60,12 @@
     "jmaCode": "017000",
     "jmaArea": "渡島地方",
     "tidePort": "hakodate",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 1,
+    "tideHc": null
   },
   {
     "id": "tomakomai",
@@ -57,7 +77,12 @@
     "jmaCode": "015000",
     "jmaArea": "胆振地方",
     "tidePort": "tomakomai",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 1,
+    "tideHc": null
   },
   {
     "id": "hachinohe",
@@ -69,19 +94,29 @@
     "jmaCode": "020000",
     "jmaArea": "三八地方",
     "tidePort": "hachinohe",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 2,
+    "tideHc": null
   },
   {
     "id": "aomori",
     "name": "青森港",
     "prefecture": "青森",
     "area": "青森中部",
-    "lat": 40.820,
+    "lat": 40.82,
     "lon": 140.741,
     "jmaCode": "020000",
     "jmaArea": "津軽地方",
     "tidePort": "aomori",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 2,
+    "tideHc": null
   },
   {
     "id": "miyako",
@@ -93,7 +128,13 @@
     "jmaCode": "030000",
     "jmaArea": "沿岸北部",
     "tidePort": "miyako",
-    "types": ["堤防", "港", "磯"]
+    "types": [
+      "堤防",
+      "港",
+      "磯"
+    ],
+    "tidePc": 3,
+    "tideHc": null
   },
   {
     "id": "kamaishi",
@@ -105,7 +146,12 @@
     "jmaCode": "030000",
     "jmaArea": "沿岸南部",
     "tidePort": "kamaishi",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 3,
+    "tideHc": null
   },
   {
     "id": "kesennuma",
@@ -117,7 +163,12 @@
     "jmaCode": "040000",
     "jmaArea": "北部",
     "tidePort": "kesennuma",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 4,
+    "tideHc": null
   },
   {
     "id": "shiogama",
@@ -129,7 +180,12 @@
     "jmaCode": "040000",
     "jmaArea": "中部",
     "tidePort": "shiogama",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 4,
+    "tideHc": null
   },
   {
     "id": "ishinomaki",
@@ -141,7 +197,12 @@
     "jmaCode": "040000",
     "jmaArea": "北部",
     "tidePort": "ishinomaki",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 4,
+    "tideHc": null
   },
   {
     "id": "sakata",
@@ -153,7 +214,12 @@
     "jmaCode": "060000",
     "jmaArea": "庄内地方",
     "tidePort": "sakata",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 6,
+    "tideHc": null
   },
   {
     "id": "onahama",
@@ -165,7 +231,12 @@
     "jmaCode": "070000",
     "jmaArea": "浜通り",
     "tidePort": "onahama",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 7,
+    "tideHc": null
   },
   {
     "id": "oarai",
@@ -177,7 +248,13 @@
     "jmaCode": "080000",
     "jmaArea": "南部",
     "tidePort": "oarai",
-    "types": ["堤防", "港", "磯"]
+    "types": [
+      "堤防",
+      "港",
+      "磯"
+    ],
+    "tidePc": 8,
+    "tideHc": null
   },
   {
     "id": "nakaminato",
@@ -189,7 +266,12 @@
     "jmaCode": "080000",
     "jmaArea": "北部",
     "tidePort": "nakaminato",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 8,
+    "tideHc": null
   },
   {
     "id": "choshi",
@@ -201,7 +283,13 @@
     "jmaCode": "120000",
     "jmaArea": "北東部",
     "tidePort": "choshi",
-    "types": ["堤防", "港", "磯"]
+    "types": [
+      "堤防",
+      "港",
+      "磯"
+    ],
+    "tidePc": 12,
+    "tideHc": null
   },
   {
     "id": "tateyama",
@@ -213,7 +301,13 @@
     "jmaCode": "120000",
     "jmaArea": "南部",
     "tidePort": "tateyama",
-    "types": ["堤防", "港", "磯"]
+    "types": [
+      "堤防",
+      "港",
+      "磯"
+    ],
+    "tidePc": 12,
+    "tideHc": null
   },
   {
     "id": "katsuura",
@@ -225,7 +319,13 @@
     "jmaCode": "120000",
     "jmaArea": "東部",
     "tidePort": "katsuura",
-    "types": ["堤防", "港", "磯"]
+    "types": [
+      "堤防",
+      "港",
+      "磯"
+    ],
+    "tidePc": 12,
+    "tideHc": null
   },
   {
     "id": "miura",
@@ -237,7 +337,12 @@
     "jmaCode": "140000",
     "jmaArea": "東部",
     "tidePort": "yokohama",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 14,
+    "tideHc": null
   },
   {
     "id": "manazuru",
@@ -249,7 +354,12 @@
     "jmaCode": "140000",
     "jmaArea": "西部",
     "tidePort": "manazuru",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 14,
+    "tideHc": null
   },
   {
     "id": "ito",
@@ -261,7 +371,12 @@
     "jmaCode": "220000",
     "jmaArea": "伊豆",
     "tidePort": "ito",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 22,
+    "tideHc": null
   },
   {
     "id": "shimoda",
@@ -273,7 +388,12 @@
     "jmaCode": "220000",
     "jmaArea": "伊豆",
     "tidePort": "shimoda",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 22,
+    "tideHc": null
   },
   {
     "id": "omaezaki",
@@ -285,7 +405,12 @@
     "jmaCode": "220000",
     "jmaArea": "西部",
     "tidePort": "omaezaki",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 22,
+    "tideHc": null
   },
   {
     "id": "irago",
@@ -297,7 +422,12 @@
     "jmaCode": "230000",
     "jmaArea": "西部",
     "tidePort": "irago",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 23,
+    "tideHc": null
   },
   {
     "id": "gamagori",
@@ -309,7 +439,12 @@
     "jmaCode": "230000",
     "jmaArea": "東部",
     "tidePort": "gamagori",
-    "types": ["堤防", "沖堤"]
+    "types": [
+      "堤防",
+      "沖堤"
+    ],
+    "tidePc": 23,
+    "tideHc": null
   },
   {
     "id": "minami_chita",
@@ -321,7 +456,12 @@
     "jmaCode": "230000",
     "jmaArea": "西部",
     "tidePort": "nagoya",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 23,
+    "tideHc": null
   },
   {
     "id": "owase",
@@ -333,7 +473,13 @@
     "jmaCode": "240000",
     "jmaArea": "南部",
     "tidePort": "owase",
-    "types": ["渡船", "磯", "堤防"]
+    "types": [
+      "渡船",
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 24,
+    "tideHc": null
   },
   {
     "id": "shima",
@@ -345,7 +491,12 @@
     "jmaCode": "240000",
     "jmaArea": "中部",
     "tidePort": "shima",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 24,
+    "tideHc": null
   },
   {
     "id": "kushimoto",
@@ -357,31 +508,46 @@
     "jmaCode": "300000",
     "jmaArea": "南部",
     "tidePort": "kushimoto",
-    "types": ["渡船", "磯"]
+    "types": [
+      "渡船",
+      "磯"
+    ],
+    "tidePc": 30,
+    "tideHc": null
   },
   {
     "id": "kada",
     "name": "加太",
     "prefecture": "和歌山",
     "area": "和歌山北部",
-    "lat": 34.150,
+    "lat": 34.15,
     "lon": 135.204,
     "jmaCode": "300000",
     "jmaArea": "北部",
     "tidePort": "kada",
-    "types": ["渡船", "堤防"]
+    "types": [
+      "渡船",
+      "堤防"
+    ],
+    "tidePc": 30,
+    "tideHc": null
   },
   {
     "id": "yura",
     "name": "由良",
     "prefecture": "和歌山",
     "area": "和歌山中部",
-    "lat": 33.960,
-    "lon": 135.100,
+    "lat": 33.96,
+    "lon": 135.1,
     "jmaCode": "300000",
     "jmaArea": "南部",
     "tidePort": "yura",
-    "types": ["渡船", "磯"]
+    "types": [
+      "渡船",
+      "磯"
+    ],
+    "tidePc": 30,
+    "tideHc": null
   },
   {
     "id": "susami",
@@ -393,31 +559,46 @@
     "jmaCode": "300000",
     "jmaArea": "南部",
     "tidePort": "kushimoto",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 30,
+    "tideHc": null
   },
   {
     "id": "izumisano",
     "name": "泉佐野",
     "prefecture": "大阪",
     "area": "大阪南部",
-    "lat": 34.400,
-    "lon": 135.430,
+    "lat": 34.4,
+    "lon": 135.43,
     "jmaCode": "270000",
     "jmaArea": "南部",
     "tidePort": "izumisano",
-    "types": ["堤防", "沖堤"]
+    "types": [
+      "堤防",
+      "沖堤"
+    ],
+    "tidePc": 27,
+    "tideHc": null
   },
   {
     "id": "sakai",
     "name": "堺・浜寺",
     "prefecture": "大阪",
     "area": "大阪湾岸",
-    "lat": 34.560,
+    "lat": 34.56,
     "lon": 135.437,
     "jmaCode": "270000",
     "jmaArea": "北部",
     "tidePort": "osaka",
-    "types": ["堤防", "沖堤"]
+    "types": [
+      "堤防",
+      "沖堤"
+    ],
+    "tidePc": 27,
+    "tideHc": null
   },
   {
     "id": "maiko",
@@ -429,7 +610,12 @@
     "jmaCode": "280000",
     "jmaArea": "南部東",
     "tidePort": "akashi",
-    "types": ["堤防", "沖堤"]
+    "types": [
+      "堤防",
+      "沖堤"
+    ],
+    "tidePc": 28,
+    "tideHc": null
   },
   {
     "id": "awaji",
@@ -441,7 +627,13 @@
     "jmaCode": "280000",
     "jmaArea": "南部西",
     "tidePort": "awaji",
-    "types": ["渡船", "磯", "堤防"]
+    "types": [
+      "渡船",
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 28,
+    "tideHc": null
   },
   {
     "id": "kii_mihara",
@@ -453,7 +645,12 @@
     "jmaCode": "300000",
     "jmaArea": "南部",
     "tidePort": "mihara",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 30,
+    "tideHc": null
   },
   {
     "id": "amagasaki",
@@ -465,7 +662,12 @@
     "jmaCode": "280000",
     "jmaArea": "南部東",
     "tidePort": "osaka",
-    "types": ["堤防", "河口"]
+    "types": [
+      "堤防",
+      "河口"
+    ],
+    "tidePc": 28,
+    "tideHc": null
   },
   {
     "id": "himeji",
@@ -477,7 +679,13 @@
     "jmaCode": "280000",
     "jmaArea": "南部西",
     "tidePort": "himeji",
-    "types": ["渡船", "磯", "堤防"]
+    "types": [
+      "渡船",
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 28,
+    "tideHc": null
   },
   {
     "id": "tottori",
@@ -489,7 +697,12 @@
     "jmaCode": "310000",
     "jmaArea": "中部",
     "tidePort": "tottori",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 31,
+    "tideHc": null
   },
   {
     "id": "sakaiminato",
@@ -501,7 +714,12 @@
     "jmaCode": "310000",
     "jmaArea": "西部",
     "tidePort": "sakaiminato",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 31,
+    "tideHc": null
   },
   {
     "id": "hamada",
@@ -513,7 +731,12 @@
     "jmaCode": "320000",
     "jmaArea": "西部",
     "tidePort": "hamada",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 32,
+    "tideHc": null
   },
   {
     "id": "oki",
@@ -525,7 +748,12 @@
     "jmaCode": "320000",
     "jmaArea": "隠岐",
     "tidePort": "oki",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 32,
+    "tideHc": null
   },
   {
     "id": "kasaoka",
@@ -537,7 +765,12 @@
     "jmaCode": "330000",
     "jmaArea": "南部",
     "tidePort": "kasaoka",
-    "types": ["渡船", "磯"]
+    "types": [
+      "渡船",
+      "磯"
+    ],
+    "tidePc": 33,
+    "tideHc": null
   },
   {
     "id": "onomichi",
@@ -549,7 +782,12 @@
     "jmaCode": "340000",
     "jmaArea": "東部",
     "tidePort": "onomichi",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 34,
+    "tideHc": null
   },
   {
     "id": "hiroshima",
@@ -561,7 +799,12 @@
     "jmaCode": "340000",
     "jmaArea": "西部",
     "tidePort": "hiroshima",
-    "types": ["堤防", "沖堤"]
+    "types": [
+      "堤防",
+      "沖堤"
+    ],
+    "tidePc": 34,
+    "tideHc": null
   },
   {
     "id": "oshima",
@@ -573,7 +816,12 @@
     "jmaCode": "350000",
     "jmaArea": "東部",
     "tidePort": "oshima",
-    "types": ["渡船", "磯"]
+    "types": [
+      "渡船",
+      "磯"
+    ],
+    "tidePc": 35,
+    "tideHc": null
   },
   {
     "id": "shimonoseki",
@@ -585,7 +833,12 @@
     "jmaCode": "350000",
     "jmaArea": "西部",
     "tidePort": "shimonoseki",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 35,
+    "tideHc": null
   },
   {
     "id": "tokushima",
@@ -597,7 +850,12 @@
     "jmaCode": "360000",
     "jmaArea": "北部",
     "tidePort": "tokushima",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 36,
+    "tideHc": null
   },
   {
     "id": "hiwasa",
@@ -605,11 +863,16 @@
     "prefecture": "徳島",
     "area": "徳島南部",
     "lat": 33.732,
-    "lon": 134.530,
+    "lon": 134.53,
     "jmaCode": "360000",
     "jmaArea": "南部",
     "tidePort": "hiwasa",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 36,
+    "tideHc": null
   },
   {
     "id": "takamatsu",
@@ -621,7 +884,12 @@
     "jmaCode": "370000",
     "jmaArea": "中部",
     "tidePort": "takamatsu",
-    "types": ["堤防", "沖堤"]
+    "types": [
+      "堤防",
+      "沖堤"
+    ],
+    "tidePc": 37,
+    "tideHc": null
   },
   {
     "id": "uwajima",
@@ -629,11 +897,16 @@
     "prefecture": "愛媛",
     "area": "愛媛南部",
     "lat": 33.224,
-    "lon": 132.560,
+    "lon": 132.56,
     "jmaCode": "380000",
     "jmaArea": "南予",
     "tidePort": "uwajima",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 38,
+    "tideHc": null
   },
   {
     "id": "matsuyama",
@@ -645,7 +918,12 @@
     "jmaCode": "380000",
     "jmaArea": "中予",
     "tidePort": "matsuyama",
-    "types": ["渡船", "磯"]
+    "types": [
+      "渡船",
+      "磯"
+    ],
+    "tidePc": 38,
+    "tideHc": null
   },
   {
     "id": "kochi",
@@ -657,7 +935,12 @@
     "jmaCode": "390000",
     "jmaArea": "中部",
     "tidePort": "kochi",
-    "types": ["堤防", "沖堤"]
+    "types": [
+      "堤防",
+      "沖堤"
+    ],
+    "tidePc": 39,
+    "tideHc": null
   },
   {
     "id": "ashizuri",
@@ -669,7 +952,11 @@
     "jmaCode": "390000",
     "jmaArea": "西部",
     "tidePort": "ashizuri",
-    "types": ["磯"]
+    "types": [
+      "磯"
+    ],
+    "tidePc": 39,
+    "tideHc": null
   },
   {
     "id": "muroto",
@@ -681,7 +968,12 @@
     "jmaCode": "390000",
     "jmaArea": "東部",
     "tidePort": "muroto",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 39,
+    "tideHc": null
   },
   {
     "id": "fukuoka",
@@ -693,7 +985,13 @@
     "jmaCode": "400000",
     "jmaArea": "福岡・筑後",
     "tidePort": "fukuoka",
-    "types": ["堤防", "磯", "沖堤"]
+    "types": [
+      "堤防",
+      "磯",
+      "沖堤"
+    ],
+    "tidePc": 40,
+    "tideHc": null
   },
   {
     "id": "kitakyushu",
@@ -705,7 +1003,12 @@
     "jmaCode": "400000",
     "jmaArea": "北九州・豊前",
     "tidePort": "kitakyushu",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 40,
+    "tideHc": null
   },
   {
     "id": "karatsu",
@@ -717,7 +1020,13 @@
     "jmaCode": "410000",
     "jmaArea": "北部",
     "tidePort": "karatsu",
-    "types": ["堤防", "磯", "港"]
+    "types": [
+      "堤防",
+      "磯",
+      "港"
+    ],
+    "tidePc": 41,
+    "tideHc": null
   },
   {
     "id": "nagasaki",
@@ -729,7 +1038,12 @@
     "jmaCode": "420000",
     "jmaArea": "長崎・島原",
     "tidePort": "nagasaki",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 42,
+    "tideHc": null
   },
   {
     "id": "goto",
@@ -741,7 +1055,12 @@
     "jmaCode": "420000",
     "jmaArea": "五島",
     "tidePort": "goto",
-    "types": ["磯", "渡船"]
+    "types": [
+      "磯",
+      "渡船"
+    ],
+    "tidePc": 42,
+    "tideHc": null
   },
   {
     "id": "tsushima",
@@ -753,7 +1072,12 @@
     "jmaCode": "420000",
     "jmaArea": "対馬・壱岐",
     "tidePort": "tsushima",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 42,
+    "tideHc": null
   },
   {
     "id": "amakusa",
@@ -765,7 +1089,12 @@
     "jmaCode": "430000",
     "jmaArea": "天草・芦北地方",
     "tidePort": "amakusa",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 43,
+    "tideHc": null
   },
   {
     "id": "usuki",
@@ -777,7 +1106,12 @@
     "jmaCode": "440000",
     "jmaArea": "中部・南部",
     "tidePort": "saiki",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 44,
+    "tideHc": null
   },
   {
     "id": "beppu",
@@ -789,7 +1123,12 @@
     "jmaCode": "440000",
     "jmaArea": "北部",
     "tidePort": "oita",
-    "types": ["堤防", "沖堤"]
+    "types": [
+      "堤防",
+      "沖堤"
+    ],
+    "tidePc": 44,
+    "tideHc": null
   },
   {
     "id": "miyazaki",
@@ -801,7 +1140,12 @@
     "jmaCode": "450000",
     "jmaArea": "宮崎・東諸県",
     "tidePort": "miyazaki",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 45,
+    "tideHc": null
   },
   {
     "id": "nichinan",
@@ -813,7 +1157,12 @@
     "jmaCode": "450000",
     "jmaArea": "日南・串間",
     "tidePort": "aburatsu",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 45,
+    "tideHc": null
   },
   {
     "id": "makurazaki",
@@ -825,7 +1174,12 @@
     "jmaCode": "460000",
     "jmaArea": "薩摩地方",
     "tidePort": "makurazaki",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 46,
+    "tideHc": null
   },
   {
     "id": "kagoshima",
@@ -837,7 +1191,12 @@
     "jmaCode": "460000",
     "jmaArea": "薩摩地方",
     "tidePort": "kagoshima",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 46,
+    "tideHc": null
   },
   {
     "id": "tanegashima",
@@ -849,7 +1208,12 @@
     "jmaCode": "460000",
     "jmaArea": "種子島・屋久島地方",
     "tidePort": "tanegashima",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 46,
+    "tideHc": null
   },
   {
     "id": "amami",
@@ -861,7 +1225,12 @@
     "jmaCode": "460000",
     "jmaArea": "奄美地方",
     "tidePort": "amami",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 46,
+    "tideHc": null
   },
   {
     "id": "naha",
@@ -873,19 +1242,29 @@
     "jmaCode": "471000",
     "jmaArea": "沖縄本島中南部",
     "tidePort": "naha",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 47,
+    "tideHc": null
   },
   {
     "id": "nago",
     "name": "名護・本部",
     "prefecture": "沖縄",
     "area": "沖縄本島北部",
-    "lat": 26.590,
+    "lat": 26.59,
     "lon": 127.977,
     "jmaCode": "471000",
     "jmaArea": "沖縄本島北部",
     "tidePort": "nago",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 47,
+    "tideHc": null
   },
   {
     "id": "miyakojima",
@@ -897,7 +1276,12 @@
     "jmaCode": "472000",
     "jmaArea": "宮古島地方",
     "tidePort": "hirara",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 47,
+    "tideHc": null
   },
   {
     "id": "ishigaki",
@@ -909,7 +1293,12 @@
     "jmaCode": "473000",
     "jmaArea": "八重山地方",
     "tidePort": "ishigaki",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 47,
+    "tideHc": null
   },
   {
     "id": "niigata",
@@ -921,7 +1310,12 @@
     "jmaCode": "150000",
     "jmaArea": "中越",
     "tidePort": "niigata",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 15,
+    "tideHc": null
   },
   {
     "id": "joetsu",
@@ -933,7 +1327,12 @@
     "jmaCode": "150000",
     "jmaArea": "上越",
     "tidePort": "naoetsu",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 15,
+    "tideHc": null
   },
   {
     "id": "toyama",
@@ -945,7 +1344,12 @@
     "jmaCode": "160000",
     "jmaArea": "富山",
     "tidePort": "toyama",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 16,
+    "tideHc": null
   },
   {
     "id": "himi",
@@ -957,7 +1361,12 @@
     "jmaCode": "160000",
     "jmaArea": "富山",
     "tidePort": "himi",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 16,
+    "tideHc": null
   },
   {
     "id": "kanazawa",
@@ -969,7 +1378,12 @@
     "jmaCode": "170000",
     "jmaArea": "加賀",
     "tidePort": "kanazawa",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 17,
+    "tideHc": null
   },
   {
     "id": "noto",
@@ -981,7 +1395,12 @@
     "jmaCode": "170000",
     "jmaArea": "能登",
     "tidePort": "wajima",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 17,
+    "tideHc": null
   },
   {
     "id": "fukui",
@@ -993,7 +1412,12 @@
     "jmaCode": "180000",
     "jmaArea": "嶺北",
     "tidePort": "mikuni",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 18,
+    "tideHc": null
   },
   {
     "id": "wakasa",
@@ -1005,7 +1429,12 @@
     "jmaCode": "180000",
     "jmaArea": "嶺南",
     "tidePort": "obama",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 18,
+    "tideHc": null
   },
   {
     "id": "maizuru",
@@ -1017,7 +1446,12 @@
     "jmaCode": "260000",
     "jmaArea": "北部",
     "tidePort": "maizuru",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 26,
+    "tideHc": null
   },
   {
     "id": "kyotango",
@@ -1025,11 +1459,16 @@
     "prefecture": "京都",
     "area": "京都北部",
     "lat": 35.734,
-    "lon": 135.020,
+    "lon": 135.02,
     "jmaCode": "260000",
     "jmaArea": "北部",
     "tidePort": "kyotango",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 26,
+    "tideHc": null
   },
   {
     "id": "toyooka",
@@ -1041,19 +1480,29 @@
     "jmaCode": "280000",
     "jmaArea": "北部",
     "tidePort": "toyooka",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 28,
+    "tideHc": null
   },
   {
     "id": "akita",
     "name": "秋田港",
     "prefecture": "秋田",
     "area": "秋田中部",
-    "lat": 39.720,
+    "lat": 39.72,
     "lon": 140.092,
     "jmaCode": "050000",
     "jmaArea": "秋田",
     "tidePort": "akita",
-    "types": ["堤防", "港"]
+    "types": [
+      "堤防",
+      "港"
+    ],
+    "tidePc": 5,
+    "tideHc": null
   },
   {
     "id": "oga",
@@ -1065,7 +1514,12 @@
     "jmaCode": "050000",
     "jmaArea": "秋田",
     "tidePort": "oga",
-    "types": ["磯", "堤防"]
+    "types": [
+      "磯",
+      "堤防"
+    ],
+    "tidePc": 5,
+    "tideHc": null
   },
   {
     "id": "sakata_port",
@@ -1077,7 +1531,13 @@
     "jmaCode": "060000",
     "jmaArea": "庄内地方",
     "tidePort": "sakata",
-    "types": ["堤防", "磯", "渡船"]
+    "types": [
+      "堤防",
+      "磯",
+      "渡船"
+    ],
+    "tidePc": 6,
+    "tideHc": null
   },
   {
     "id": "iwaki",
@@ -1089,6 +1549,11 @@
     "jmaCode": "070000",
     "jmaArea": "浜通り",
     "tidePort": "onahama",
-    "types": ["堤防", "磯"]
+    "types": [
+      "堤防",
+      "磯"
+    ],
+    "tidePc": 7,
+    "tideHc": null
   }
 ]
