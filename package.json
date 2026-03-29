@@ -2,5 +2,10 @@
   "name": "fishing-app",
   "version": "1.0.0",
   "description": "関西渡船・海釣り 天気チェッカー",
-  "engines": { "node": "20.x" }
+  "engines": {
+    "node": "20.x"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  }
 }
